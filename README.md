@@ -74,6 +74,8 @@ context-aware-recsys/
 │   ├── context_features.py     # Extraction des features contextuelles
 │   ├── models.py               # Architectures NCF et NCF+Contexte
 │   └── metrics.py              # NDCG@K, Hit Rate@K, MRR
+├── 🧑‍💻 app/                     # Application Streamlit interactive
+│   └── streamlit_app.py         # Interface de comparaison des modèles
 │
 ├── 📊 results/                 # Sorties du projet — générées automatiquement
 │   ├── figures/                # Graphiques et visualisations
@@ -399,15 +401,22 @@ uv sync
 
 # 4. Lancer Jupyter
 uv run jupyter lab
+
+## Application interactive Streamlit
+
+```bash
+uv run streamlit run app/streamlit_app.py
 ```
 
-> Si tu n'utilises pas `uv`, tu peux remplacer `uv sync` par `python3 -m pip install numpy pandas matplotlib seaborn scikit-learn torch jupyterlab` et `uv run jupyter lab` par `python3 -m jupyter lab`.
+> Si tu n'utilises pas `uv`, tu peux remplacer `uv sync` par `python3 -m pip install numpy pandas matplotlib seaborn scikit-learn torch jupyterlab streamlit` et `uv run jupyter lab` par `python3 -m jupyter lab`.
 
 ### Vérifier que tout fonctionne
 
 ```bash
 uv run python -c "import torch; print(f'PyTorch {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
 ```
+
+> Si tu lances l'application Streamlit, vérifie aussi que `results/models/baseline_ncf_ml100k.pt` et `results/models/context_ncf_ml100k.pt` existent pour charger les modèles entraînés.
 
 ---
 
