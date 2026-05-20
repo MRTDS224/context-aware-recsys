@@ -34,3 +34,6 @@ results/models/
 # Data
 data/raw/
 data/processed/
+
+# Docs
+docs/
