@@ -158,7 +158,10 @@ Suis les notebooks **dans l'ordre numérique**. Chacun produit des fichiers util
 **Téléchargement** : https://grouplens.org/datasets/movielens/
 
 ```bash
-bash scripts/download_data.sh  # télécharge automatiquement les deux
+# Télécharger manuellement les données MovieLens depuis GroupLens
+# puis placer les fichiers dans :
+# - data/raw/movielens/ml-100k/
+# - data/raw/movielens/ml-1m/
 ```
 
 | Propriété | ML-100K | ML-1M |
@@ -375,7 +378,8 @@ Pour un utilisateur donné : comment changent ses recommandations selon...
 ### Prérequis
 
 - Python 3.12
-- [uv](https://github.com/astral-sh/uv) : `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- Jupyter Lab ou Jupyter Notebook
+- `uv` (optionnel mais pris en charge)
 - GPU recommandé (CUDA 12+), mais **CPU suffit pour MovieLens-100K**
 
 ### Démarrage en 4 étapes
@@ -388,12 +392,16 @@ cd context-aware-recsys
 # 2. Installer les dépendances
 uv sync
 
-# 3. Télécharger les données
-bash scripts/download_data.sh
+# 3. Télécharger les données et les placer dans data/raw/
+#    MovieLens 100K  -> data/raw/movielens/ml-100k/
+#    MovieLens 1M    -> data/raw/movielens/ml-1m/
+#    RetailRocket    -> data/raw/retailrocket/
 
-# 4. Lancer Jupyter et ouvrir le notebook 01
+# 4. Lancer Jupyter
 uv run jupyter lab
 ```
+
+> Si tu n'utilises pas `uv`, tu peux remplacer `uv sync` par `python3 -m pip install numpy pandas matplotlib seaborn scikit-learn torch jupyterlab` et `uv run jupyter lab` par `python3 -m jupyter lab`.
 
 ### Vérifier que tout fonctionne
 
@@ -431,4 +439,4 @@ Les résultats (hyperparamètres + métriques) de chaque expérience sont sauveg
 
 ---
 
-*Python 3.12 · PyTorch · uv · Jupyter Lab*
+*Python 3.12 · PyTorch · Jupyter Lab*
