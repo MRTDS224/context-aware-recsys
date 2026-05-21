@@ -202,9 +202,8 @@ st.markdown(
 # CHEMINS ET CONSTANTES
 # ─────────────────────────────────────────────
 RAW_ROOT = ROOT / "data" / "raw" / "movielens" / "ml-100k"
-RESULTS_DIR = ROOT / "results" / "models"
-BASELINE_PATH = RESULTS_DIR / "baseline_ncf_ml100k.pt"
-CONTEXT_PATH = RESULTS_DIR / "context_ncf_ml100k.pt"
+RESULTS_DIR = ROOT / "results" / "models" / "movielens_100k" / "ncf"
+MODEL_PATH = RESULTS_DIR / "last_model.pt"
 MOVIES_PATH = RAW_ROOT / "movies.csv"
 
 @st.cache_data
@@ -220,55 +219,37 @@ def load_movie_catalog():
 
 @st.cache_data
 def load_dataset_shape():
-    if RAW_ROOT.exists():
-        try:
-            df = load_movielens_100k(RAW_ROOT)
-            df = encode_ids(df)
-            n_users = int(df['user_id_encoded'].nunique())
-            n_items = int(df['item_id_encoded'].nunique())
-            return n_users, n_items
-        except Exception:
-            pass
-    return 943, 1682
+    # Les paramètres du modèle sauvegardé
+    # n_users=943, n_items=1349 (items vraiment notés dans l'ensemble d'entraînement)
+    return 943, 1349
 
 @st.cache_resource
 def load_models(n_users: int, n_items: int):
-    baseline = NCF(
+    """Charge le modèle NCF depuis le fichier sauvegardé."""
+    # Paramètres déduits du checkpoint sauvegardé
+    model = NCF(
         num_users=n_users,
         num_items=n_items,
-        embed_dim=32,
-        mlp_layers=[64, 32, 16],
+        embed_dim=64,
+        mlp_layers=[128, 64, 32, 16],
         dropout=0.2,
     )
-    context = NCFContext(
-        num_users=n_users,
-        num_items=n_items,
-        context_dim=8,
-        embed_dim=32,
-        mlp_layers=[64, 32, 16],
-        context_embed_dim=32,
-        dropout=0.2,
-        fusion_type='concat',
-    )
-    models = {
-        'NCF Baseline': (BASELINE_PATH, baseline),
-        'NCF Context':  (CONTEXT_PATH, context),
-    }
-
-    loaded_models = {}
-    for name, (path, model) in models.items():
-        if path.exists():
-            try:
-                model.load_state_dict(torch.load(path, map_location='cpu'))
-                model.eval()
-                loaded_models[name] = model
-            except Exception as exc:
-                st.warning(f"⚠️ Impossible de charger {name} depuis {path.name} : {exc}")
-                loaded_models[name] = model
-        else:
-            st.info(f"ℹ️ Fichier {path.name} introuvable : mode démo activé pour {name}.")
-            loaded_models[name] = model
-    return loaded_models
+    
+    # Essaie de charger les poids du fichier
+    if MODEL_PATH.exists():
+        try:
+            state_dict = torch.load(MODEL_PATH, map_location='cpu')
+            model.load_state_dict(state_dict)
+            model.eval()
+            st.success(f"✅ Modèle chargé depuis {MODEL_PATH.name}")
+        except Exception as exc:
+            st.warning(f"⚠️ Impossible de charger le modèle : {exc}. Mode démo activé.")
+            model.eval()
+    else:
+        st.info(f"ℹ️ Fichier {MODEL_PATH.name} introuvable : mode démo activé.")
+        model.eval()
+    
+    return model
 
 
 def build_context_vector(hour: int, day_of_week: int, minutes_since_last: int, session_length: int, session_position: int):
@@ -290,21 +271,37 @@ def build_context_vector(hour: int, day_of_week: int, minutes_since_last: int, s
     ]
 
 
-def get_recommendations(model, user_id: int, context_vec: list[float], top_k: int = 5):
-    n_items = len(MOVIES)
-    u_tensor = torch.tensor([user_id] * n_items, dtype=torch.long)
-    i_tensor = torch.arange(n_items, dtype=torch.long)
-    ctx_tensor = torch.tensor(context_vec, dtype=torch.float32).unsqueeze(0).repeat(n_items, 1)
+def get_recommendations(model, user_id: int, context_vec: list[float], n_items_trained: int, top_k: int = 5):
+    """Génère des recommandations pour un utilisateur et un contexte donnés.
+    
+    Args:
+        model: Modèle NCF
+        user_id: ID de l'utilisateur
+        context_vec: Vecteur de contexte (non utilisé par NCF pur, mais pour compatibilité)
+        n_items_trained: Nombre d'items sur lesquels le modèle a été entraîné
+        top_k: Nombre de recommandations à retourner
+    """
+    u_tensor = torch.tensor([user_id] * n_items_trained, dtype=torch.long)
+    i_tensor = torch.arange(n_items_trained, dtype=torch.long)
 
     with torch.no_grad():
         if isinstance(model, NCFContext):
+            ctx_tensor = torch.tensor(context_vec, dtype=torch.float32).unsqueeze(0).repeat(n_items_trained, 1)
             preds = model(u_tensor, i_tensor, ctx_tensor)
         else:
             preds = model(u_tensor, i_tensor)
 
     preds = preds.cpu().numpy()
     top_idx = np.argsort(preds)[::-1][:top_k]
-    return [(MOVIES[i], float(preds[i]), GENRES[i]) for i in top_idx]
+    
+    # Retourne les films correspondants (avec fallback si l'index dépasse la liste)
+    results = []
+    for i in top_idx:
+        if i < len(MOVIES):
+            results.append((MOVIES[i], float(preds[i]), GENRES[i]))
+        else:
+            results.append((f"Film {i}", float(preds[i]), "Inconnu"))
+    return results
 
 
 # ─────────────────────────────────────────────
@@ -312,10 +309,10 @@ def get_recommendations(model, user_id: int, context_vec: list[float], top_k: in
 # ─────────────────────────────────────────────
 MOVIES, GENRES = load_movie_catalog()
 N_USERS, N_ITEMS = load_dataset_shape()
-MODELS = load_models(N_USERS, N_ITEMS)
+MODEL = load_models(N_USERS, N_ITEMS)
 
 st.markdown('<div class="hero-title">RecoArena 🎬</div>', unsafe_allow_html=True)
-st.markdown('<div class="hero-sub">Comparez des modèles de recommandation avec le contexte MovieLens 100K</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-sub">Explorez les recommandations NCF avec contexte MovieLens 100K</div>', unsafe_allow_html=True)
 st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
 with st.sidebar:
@@ -332,7 +329,7 @@ with st.sidebar:
     session_movies = st.multiselect(
         "Films vus dans cette session",
         MOVIES,
-        default=MOVIES[:2],
+        default=MOVIES[:2] if len(MOVIES) >= 2 else MOVIES,
         max_selections=5,
     )
     session_length = max(1, len(session_movies))
@@ -349,15 +346,9 @@ with st.sidebar:
 if "history" not in st.session_state:
     st.session_state.history = []
 
-if "votes" not in st.session_state:
-    st.session_state.votes = {name: 0 for name in MODELS}
-
 if run_btn or st.session_state.history:
     ctx_vec = build_context_vector(hour, day_of_week, minutes_since_last, session_length, session_position)
-    recommendations = {
-        name: get_recommendations(model, user_id, ctx_vec)
-        for name, model in MODELS.items()
-    }
+    recommendations = get_recommendations(MODEL, user_id, ctx_vec, N_ITEMS)
     st.session_state.last_recos = recommendations
 
 if st.session_state.get("last_recos"):
@@ -377,66 +368,53 @@ if st.session_state.get("last_recos"):
         unsafe_allow_html=True,
     )
 
-    cols = st.columns(len(MODELS))
-    for col, (model_name, model) in zip(cols, MODELS.items()):
-        with col:
-            badge = "badge-ncf" if model_name == "NCF Baseline" else "badge-context"
-            color = "ncf" if model_name == "NCF Baseline" else "context"
-            desc = "NCF pur" if model_name == "NCF Baseline" else "NCF + contexte"
-            st.markdown(
-                f"""
-                <div class='section-label'>
-                    {model_name}
-                    <br><span style='font-size:0.75rem; font-weight:400; color:#6b7280;'>{desc}</span>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-            for rank, (title, score, genre) in enumerate(recos[model_name], 1):
-                width = int((score - np.min([r[1] for r in recos[model_name]])) * 100 + 10)
-                st.markdown(
-                    f"""
-                    <div class='model-card {color}'>
-                        <span class='model-badge {badge}'>#{rank} · {genre}</span>
-                        <p class='item-title'>{title}</p>
-                        <p class='item-score'>Score : {score:.3f}</p>
-                        <div class='score-bar {color}' style='width:{min(100, width)}%'></div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-            if st.button(f"✅ Voter pour {model_name}", key=f"vote_{model_name}", use_container_width=True):
-                st.session_state.votes[model_name] += 1
-                st.session_state.history.append({
-                    "user": user_id,
-                    "heure": hour,
-                    "jour": day_name,
-                    "choix": model_name,
-                })
-                st.experimental_rerun()
+    st.markdown(
+        """
+        <div class='section-label'>
+            🎬 Recommandations NCF
+            <br><span style='font-size:0.75rem; font-weight:400; color:#6b7280;'>Neural Collaborative Filtering</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    
+    for rank, (title, score, genre) in enumerate(recos, 1):
+        width = int((score - min(r[1] for r in recos)) * 100 + 10)
+        st.markdown(
+            f"""
+            <div class='model-card ncf'>
+                <span class='model-badge badge-ncf'>#{rank} · {genre}</span>
+                <p class='item-title'>{title}</p>
+                <p class='item-score'>Score : {score:.3f}</p>
+                <div class='score-bar ncf' style='width:{min(100, width)}%'></div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-label">📊 Votes</div>', unsafe_allow_html=True)
-    total_votes = sum(st.session_state.votes.values())
-    stat_cols = st.columns(3)
-    for col, name in zip(stat_cols, MODELS):
-        with col:
-            st.markdown(
-                f"""
-                <div class='stat-box'>
-                    <div class='stat-num' style='color:#a78bfa'>{st.session_state.votes[name]}</div>
-                    <div class='stat-lbl'>{name}</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-    if total_votes > 0:
-        winner = max(st.session_state.votes, key=st.session_state.votes.get)
-        st.markdown(f"<div class='winner-banner'><h2>🏆 {winner}</h2><p style='color:#6b7280;'>Modèle préféré par les votes</p></div>", unsafe_allow_html=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("👍 Recommandation pertinente", use_container_width=True):
+            st.session_state.history.append({
+                "user": user_id,
+                "heure": hour,
+                "jour": day_name,
+                "feedback": "👍 Pertinent",
+            })
+            st.success("Merci pour ton retour !")
+    
+    with col2:
+        if st.button("👎 Recommandation non pertinente", use_container_width=True):
+            st.session_state.history.append({
+                "user": user_id,
+                "heure": hour,
+                "jour": day_name,
+                "feedback": "👎 Non pertinent",
+            })
+            st.warning("Retour enregistré, on s'améliore !")
 
     if st.session_state.history:
         st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-        with st.expander("📋 Historique des votes"):
+        with st.expander("📋 Historique des retours"):
             df_history = pd.DataFrame(st.session_state.history)
             st.dataframe(df_history, use_container_width=True, hide_index=True)
