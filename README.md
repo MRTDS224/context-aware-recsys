@@ -130,12 +130,13 @@ Suis les notebooks **dans l'ordre numérique**. Chacun produit des fichiers util
 - Créer les features de session : durée, position dans la session
 
 **Notebook 03 — Modèle Baseline (NCF sans contexte)**
-- Entraîner un NCF classique sur MovieLens-100K
+- Entraîner un NCF classique sur MovieLens-100K, MovieLens-1M et RetailRocket
 - Mesurer NDCG@10 et Hit Rate@10 → **c'est ta référence**
 - ⚠️ Commence par ML-100K : entraînement en ~5 min sur CPU
 
 **Notebook 04 — Modèle avec Contexte**
 - Ajouter les features contextuelles au NCF
+- Sauvegarder un modèle contextuel pour chaque dataset
 - Tester différentes façons de fusionner contexte + NCF
 - Observer si les courbes d'entraînement s'améliorent
 
@@ -401,12 +402,26 @@ uv sync
 
 # 4. Lancer Jupyter
 uv run jupyter lab
+```
 
 ## Application interactive Streamlit
 
 ```bash
 uv run streamlit run app/streamlit_app.py
 ```
+
+L'application permet maintenant de choisir le dataset (`MovieLens 100K`, `MovieLens 1M` ou `RetailRocket`) puis le modèle disponible (`Baseline NCF` ou `NCF + contexte`). Elle charge les checkpoints suivants depuis `results/models/` :
+
+```text
+baseline_ncf_ml100k.pt
+context_ncf_ml100k.pt
+baseline_ncf_ml1m.pt
+context_ncf_ml1m.pt
+baseline_ncf_retailrocket.pt
+context_ncf_retailrocket.pt
+```
+
+Le fichier `last_model.pt`, s'il existe, n'est pas utilisé par l'application.
 
 > Si tu n'utilises pas `uv`, tu peux remplacer `uv sync` par `python3 -m pip install numpy pandas matplotlib seaborn scikit-learn torch jupyterlab streamlit` et `uv run jupyter lab` par `python3 -m jupyter lab`.
 
@@ -416,7 +431,11 @@ uv run streamlit run app/streamlit_app.py
 uv run python -c "import torch; print(f'PyTorch {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
 ```
 
-> Si tu lances l'application Streamlit, vérifie aussi que `results/models/baseline_ncf_ml100k.pt` et `results/models/context_ncf_ml100k.pt` existent pour charger les modèles entraînés.
+> Si tu lances l'application Streamlit, vérifie aussi que les checkpoints correspondant au dataset choisi existent dans `results/models/`.
+
+## Reproductibilité
+
+```python
 SEED = 42
 torch.manual_seed(SEED)
 numpy.random.seed(SEED)
