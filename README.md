@@ -416,15 +416,7 @@ uv run streamlit run app/streamlit_app.py
 uv run python -c "import torch; print(f'PyTorch {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
 ```
 
-> Si tu lances l'application Streamlit, vérifie aussi que `results/models/baseline_ncf_ml100k.pt` et `results/models/context_ncf_ml100k.pt` existent pour charger les modèles entraînés.
-
----
-
-## Reproductibilité
-
-Toutes les expériences utilisent une graine aléatoire fixée — les résultats sont identiques à chaque exécution :
-
-```python
+> Si tu lances l'application Streamlit, vérifie aussi que `results/models/baseline_ncf_ml100k.pt` existe pour charger le modèle entraîné.
 SEED = 42
 torch.manual_seed(SEED)
 numpy.random.seed(SEED)
