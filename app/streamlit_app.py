@@ -383,13 +383,16 @@ with st.sidebar:
         max_selections=5,
     )
     session_length = max(1, len(session_movies))
-    session_position = st.slider(
-        "Position dans la session",
-        1,
-        session_length,
-        session_length,
-        disabled=(session_length <= 1),
-    )
+    if session_length > 1:
+        session_position = st.slider(
+            "Position dans la session",
+            1,
+            session_length,
+            session_length,
+        )
+    else:
+        session_position = 1
+        st.write("Position dans la session : 1 (session unique)")
 
     run_btn = st.button("🚀 Lancer les recommandations", use_container_width=True)
 

@@ -28,6 +28,18 @@ def extract_session_features(df: pd.DataFrame, user_col: str = 'user_id',
     Construit les features de session basées sur un gap temporel.
     """
     df = df.copy()
+
+    # Supprimer les colonnes de session existantes pour éviter les conflits lors d'un recalcul.
+    session_cols = [
+        'session_id',
+        'session_length',
+        'session_position',
+        'session_position_norm',
+        'time_since_last_interaction',
+        'time_since_last_interaction_log'
+    ]
+    df = df.drop(columns=[c for c in session_cols if c in df.columns])
+
     df = df.sort_values([user_col, timestamp_col])
     
     # Calculer la différence de temps en secondes avec l'interaction précédente
