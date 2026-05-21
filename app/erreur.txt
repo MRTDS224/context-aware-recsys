@@ -1,0 +1,116 @@
+uv run streamlit run ./app/streamlit_app.py 
+2026-05-21 11:21:20.499 Uvicorn server started on 0.0.0.0:8501
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://192.168.59.201:8501
+
+2026-05-21 11:22:59.665 Uncaught app execution
+Traceback (most recent call last):
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/app/streamlit_app.py", line 386, in <module>
+    session_position = st.slider(
+                       ^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/metrics_util.py", line 698, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/elements/widgets/slider.py", line 721, in slider
+    return self._slider(
+           ^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/elements/widgets/slider.py", line 1002, in _slider
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Slider `min_value` must be less than the `max_value`.
+The values were 1 and 1.
+2026-05-21 11:23:22.932 Uncaught app execution
+Traceback (most recent call last):
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/app/streamlit_app.py", line 386, in <module>
+    session_position = st.slider(
+                       ^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/metrics_util.py", line 698, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/elements/widgets/slider.py", line 721, in slider
+    return self._slider(
+           ^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/elements/widgets/slider.py", line 1002, in _slider
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Slider `min_value` must be less than the `max_value`.
+The values were 1 and 1.
+2026-05-21 11:23:56.180 Uncaught app execution
+Traceback (most recent call last):
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/app/streamlit_app.py", line 386, in <module>
+    session_position = st.slider(
+                       ^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/metrics_util.py", line 698, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/elements/widgets/slider.py", line 721, in slider
+    return self._slider(
+           ^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/elements/widgets/slider.py", line 1002, in _slider
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Slider `min_value` must be less than the `max_value`.
+The values were 1 and 1.
+2026-05-21 11:23:58.867 Uncaught app execution
+Traceback (most recent call last):
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/app/streamlit_app.py", line 386, in <module>
+    session_position = st.slider(
+                       ^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/metrics_util.py", line 698, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/elements/widgets/slider.py", line 721, in slider
+    return self._slider(
+           ^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/elements/widgets/slider.py", line 1002, in _slider
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Slider `min_value` must be less than the `max_value`.
+The values were 1 and 1.
+2026-05-21 11:24:03.794 Uncaught app execution
+Traceback (most recent call last):
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/app/streamlit_app.py", line 386, in <module>
+    session_position = st.slider(
+                       ^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/runtime/metrics_util.py", line 698, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/elements/widgets/slider.py", line 721, in slider
+    return self._slider(
+           ^^^^^^^^^^^^^
+  File "/home/mrtds/Documents/my_projects/context-aware-recsys/.venv/lib/python3.12/site-packages/streamlit/elements/widgets/slider.py", line 1002, in _slider
+    raise StreamlitAPIException(
+streamlit.errors.StreamlitAPIException: Slider `min_value` must be less than the `max_value`.
+The values were 1 and 1.
+^Z
+[1]+  Stopped                    uv run streamlit run ./app/streamlit_app.py
+(context-aware-recsys) mrtds@fedora:~/Documents/my_projects/context-aware-recsys$ 
